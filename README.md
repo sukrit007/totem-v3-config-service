@@ -28,7 +28,12 @@ npm install
 ## Run
  
 ### Local
-TODO: Add steps for invoking lambda function locally.
+
+To invoke config load task lambda function locally, execute command:
+
+```bash
+sam local invoke --template totem-deploy.yml --event events/load-config-event.json
+```
 
 
 ## Test

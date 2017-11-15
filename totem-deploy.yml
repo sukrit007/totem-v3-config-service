@@ -36,7 +36,7 @@ Resources:
   LoadConfigTask:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.loadConfig
+      Handler: index.loadConfigTask
       Runtime: nodejs6.10
       Environment:
         Variables: {}
