@@ -52,7 +52,7 @@ Parameters:
     Description: Name of the environment stack
     Type: String
     MinLength: 1
-    Default: 'totem-config-environment'
+    Default: 'totem-config-service-environment'
 
   Environment:
     Description: Environment (development, production, etc)

@@ -76,10 +76,12 @@ aws --profile=$PROFILE s3 cp ./totem-pipeline.yml s3://$OUTPUT_TEMPLATE &&
 
 aws --profile=$PROFILE cloudformation create-stack \
   --template-url=https://s3.amazonaws.com/$OUTPUT_TEMPLATE \
-  --stack-name=totem-config-service-development \
+  --stack-name=totem-config-service-pipeline-development \
   --parameters \
     "ParameterKey=GithubOauthToken,ParameterValue=${GITHUB_OAUTH_TOKEN}" \
     "ParameterKey=GitBranch,ParameterValue=feature_config" \
+    "ParameterKey=TestGitOwner,ParameterValue=totem" \
+    "ParameterKey=TestGitRepo,ParameterValue=totem-demo" \
   --tags \
     "Key=app,Value=totem-config-service" \
     "Key=env,Value=development" \
@@ -88,7 +90,6 @@ aws --profile=$PROFILE cloudformation create-stack \
 ```
 where:
 - **GITHUB_OAUTH_TOKEN**: Personal oauth token to access github repositories and for configuring webhooks.
-- **WEBHOOK_SECRET**: Secret used for configuring totem-v3 github webhooks
 - **AWS_CLI_PROFILE**: [AWS CLI Profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
 
 To monitor the status of the stack creation, use command:
@@ -108,28 +109,6 @@ aws --profile=$PROFILE cloudformation deploy \
   --stack-name=totem-config-service-pipeline-development \
   --parameter-overrides \
     "GitBranch=develop"
-```
-
-where:
-- **AWS_CLI_PROFILE**: AWS CLI Profile
-
-
-## Download Swagger Document
-
-Once API is deployed, you can download swagger document for the deployed API using command:
-
-```bash
-set -o pipefail
-PROFILE=[AWS_CLI_PROFILE]
-API_ID="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
-  --logical-resource-id=ApiGateway \
-  --stack-name=totem-config-service-development \
-  --output text | tail -1 | awk '{print $1}')" &&
-aws --profile=$PROFILE apigateway get-export \
-  --rest-api-id=$API_ID \
-  --stage-name=prod \
-  --export-type=swagger \
-  --accepts=application/yaml  swagger.yml
 ```
 
 where:
