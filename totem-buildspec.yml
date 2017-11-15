@@ -12,7 +12,7 @@ phases:
       - aws cloudformation package
             --template-file totem-deploy.yml
             --s3-bucket $TOTEM_BUCKET
-            --output-template-file totem-deploy-packaged.yml
+            --output-template-file totem-deploy-package.yml
             --s3-prefix=cloudformation/sam
       - |
           cat <<END>template-config.json
@@ -32,5 +32,5 @@ phases:
 artifacts:
   type: zip
   files:
-    - totem-deploy-packaged.yml
+    - totem-deploy-package.yml
     - template-config.json

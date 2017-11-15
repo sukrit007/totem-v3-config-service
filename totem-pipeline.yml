@@ -105,6 +105,7 @@ Resources:
         Fn::ImportValue: !Sub "${EnvironmentStack}-CodeBuildRole"
       Source:
         Type: CODEPIPELINE
+        BuildSpec: 'totem-buildspec.yml'
       TimeoutInMinutes: 5
 
   CodeBuildFunctionalTest:
@@ -202,7 +203,7 @@ Resources:
                   Fn::ImportValue: !Sub "${EnvironmentStack}-LambdaDeployRoleArn"
                 StackName: !Sub "${App}-${Environment}"
                 ChangeSetName: LamdaDeploy
-                TemplatePath: "build::packaged-template.yml"
+                TemplatePath: "build::totem-deploy-package.yml"
                 TemplateConfiguration: "build::template-config.json"
                 ParameterOverrides: !Sub |
                   {
