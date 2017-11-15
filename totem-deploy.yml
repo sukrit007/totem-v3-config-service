@@ -41,7 +41,7 @@ Resources:
       Environment:
         Variables: {}
       Role:
-        Fn::ImportValue: !Sub "${EnvironmentStack}-ConfigLambdaRoleArn"
+        Fn::ImportValue: !Sub "${EnvironmentStack}-LambdaRoleArn"
 
 Outputs:
 
