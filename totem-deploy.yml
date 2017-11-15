@@ -45,6 +45,6 @@ Resources:
 
 Outputs:
 
-  ConfigServiceTasks:
+  LoadConfigTask:
     Description: Config Service Tasks Lambda Function
-    Value: !Ref ConfigServiceTasks
+    Value: !Ref LoadConfigTask

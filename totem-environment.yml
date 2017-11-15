@@ -179,27 +179,6 @@ Resources:
                       - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
                       - "*"
 
-
-  StepFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - !Sub states.${AWS::Region}.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      Policies:
-        - PolicyName: InvokeFunction
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'lambda:InvokeFunction'
-                Resource: '*'
-
 Outputs:
   LambdaRoleArn:
     Value: !GetAtt LambdaRole.Arn
@@ -221,8 +200,3 @@ Outputs:
     Value: !GetAtt LambdaDeployRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}-LambdaDeployRoleArn
-
-  StepFunctionRoleArn:
-    Value: !GetAtt StepFunctionRole.Arn
-    Export:
-      Name: !Sub ${AWS::StackName}-StepFunctionRoleArn

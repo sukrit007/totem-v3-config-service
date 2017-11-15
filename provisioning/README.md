@@ -15,19 +15,19 @@ TOTEM_BUCKET="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
   --stack-name=totem-global \
   --output text | tail -1 | awk '{print $1}')" &&
 
-OUTPUT_TEMPLATE="$TOTEM_BUCKET/cloudformation/totem-environment.yml" && 
+OUTPUT_TEMPLATE="$TOTEM_BUCKET/cloudformation/totem-config-service-environment.yml" && 
 
 aws --profile=$PROFILE s3 cp ./totem-environment.yml s3://$OUTPUT_TEMPLATE &&
 
 aws --profile=$PROFILE cloudformation create-stack \
   --template-url=https://s3.amazonaws.com/$OUTPUT_TEMPLATE \
-  --stack-name=totem-environment \
+  --stack-name=totem-config-service-environment \
   --capabilities=CAPABILITY_NAMED_IAM \
   --tags \
-    "Key=app,Value=totem-v3" \
+    "Key=app,Value=totem-config-service" \
     "Key=env,Value=development" \
     "Key=client,Value=totem" \
-    "Key=stacktype,Value=totem-environment"
+    "Key=stacktype,Value=totem-config-service-environment"
 ```
 
 where:
@@ -38,11 +38,22 @@ To monitor the status of the stack creation, use command:
 
 ```bash
 aws --profile=contrail cloudformation describe-stacks \
-  --stack-name=totem-environment  
+  --stack-name=totem-config-service-environment  
 ```
 
 Note:
 - You must modify tags for appropriate totem cluster
+
+#### Update Environment Stack
+To update existing environmnet stack, run command:
+
+```bash
+aws --profile=contrail cloudformation deploy \         
+  --template-file=./totem-environment.yml \                    
+  --stack-name=totem-config-service-environment \
+  --capabilities=CAPABILITY_NAMED_IAM
+```
+
 
 ## Setup Pipeline
 
@@ -54,7 +65,6 @@ To create a new pipeline execute following command:
 set -o pipefail
 PROFILE=[AWS_CLI_PROFILE]
 GITHUB_OAUTH_TOKEN=[GITHUB_OAUTH_TOKEN]
-WEBHOOK_SECRET=[WEBHOOK_SECRET]
 TOTEM_BUCKET="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
   --logical-resource-id=TotemBucket \
   --stack-name=totem-global \
@@ -69,11 +79,11 @@ aws --profile=$PROFILE cloudformation create-stack \
   --stack-name=totem-config-service-development \
   --parameters \
     "ParameterKey=GithubOauthToken,ParameterValue=${GITHUB_OAUTH_TOKEN}" \
-    "ParameterKey=WebhookSecret,ParameterValue=${WEBHOOK_SECRET}" \
+    "ParameterKey=GitBranch,ParameterValue=feature_config" \
   --tags \
     "Key=app,Value=totem-config-service" \
     "Key=env,Value=development" \
-    "Key=client,Value=meltmedia" \
+    "Key=client,Value=totem" \
     "Key=stacktype,Value=totem-config-service-pipeline"
 ```
 where:
@@ -84,14 +94,16 @@ where:
 To monitor the status of the stack creation, use command:
 
 ```bash
-aws --profile=[aws-cli-profile] cloudformation describe-stacks \
+PROFILE=[AWS_CLI_PROFILE]
+aws --profile=$PROFILE cloudformation describe-stacks \
   --stack-name=totem-config-service-pipeline-development
 ```
 
 ### Update existing pipeline
 
 ```bash
-aws --profile=[aws-cli-profile] cloudformation deploy \
+PROFILE=[AWS_CLI_PROFILE]
+aws --profile=$PROFILE cloudformation deploy \
   --template-file=./totem-pipeline.yml \
   --stack-name=totem-config-service-pipeline-development \
   --parameter-overrides \
@@ -99,7 +111,7 @@ aws --profile=[aws-cli-profile] cloudformation deploy \
 ```
 
 where:
-- **aws-cli-profile**: AWS CLI Profile
+- **AWS_CLI_PROFILE**: AWS CLI Profile
 
 
 ## Download Swagger Document
@@ -108,7 +120,7 @@ Once API is deployed, you can download swagger document for the deployed API usi
 
 ```bash
 set -o pipefail
-PROFILE=[aws-cli-profile]
+PROFILE=[AWS_CLI_PROFILE]
 API_ID="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
   --logical-resource-id=ApiGateway \
   --stack-name=totem-config-service-development \
@@ -121,4 +133,4 @@ aws --profile=$PROFILE apigateway get-export \
 ```
 
 where:
-- **aws-cli-profile**: AWS CLI Profile
+- **AWS_CLI_PROFILE**: AWS CLI Profile
