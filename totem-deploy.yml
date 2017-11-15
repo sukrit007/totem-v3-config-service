@@ -1,0 +1,50 @@
+# Cloudformation deployment template for config service
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  GlobalStack:
+    Description: Name of totem global stack
+    Type: String
+    MinLength: 1
+    Default: 'totem-global'
+
+  EnvironmentStack:
+    Description: Name of environment stack
+    Type: String
+    MinLength: 1
+
+  Environment:
+    Description: Config Service environment (development, production, etc)
+    Type: String
+    MinLength: 1
+    Default: 'development'
+
+  GitBranch:
+    Type: String
+    Description: Git branch for source repository
+    MinLength: 1
+    Default: develop
+
+  GithubOauthToken:
+    Type: String
+    NoEcho: true
+    Description: Github Oauth token to configure hooks and pipeline with source github
+    MinLength: 1
+
+Resources:
+  LoadConfigTask:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.loadConfig
+      Runtime: nodejs6.10
+      Environment:
+        Variables: {}
+      Role:
+        Fn::ImportValue: !Sub "${EnvironmentStack}-ConfigLambdaRoleArn"
+
+Outputs:
+
+  ConfigServiceTasks:
+    Description: Config Service Tasks Lambda Function
+    Value: !Ref ConfigServiceTasks

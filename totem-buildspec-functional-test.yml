@@ -1,0 +1,13 @@
+# AWS CodeBuild Build Specification for Building and packaging Orchestrator
+version: 0.1
+phases:
+  install:
+    commands:
+      - npm install -g gulp-cli
+      - npm install
+
+  build:
+    commands:
+      - |
+          set -o pipefail \
+          && gulp test:functional

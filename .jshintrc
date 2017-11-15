@@ -1,0 +1,20 @@
+{
+  "bitwise": false,
+  "camelcase": true,
+  "curly": false,
+  "newcap": true,
+  "quotmark": true,
+  "maxdepth": 8,
+  "maxlen": 120,
+  "varstmt": true,
+  "boss": true,
+  "esversion": 6,
+  "globalstrict": true,
+  "laxcomma": true,
+  "sub": true,
+  "browser": false,
+  "devel": false,
+  "mocha": true,
+  "node": true,
+  "expr": true
+}
