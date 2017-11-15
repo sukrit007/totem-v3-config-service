@@ -1,4 +1,4 @@
-# AWS CodeBuild Build Specification for Building and packaging Orchestrator
+# AWS CodeBuild Build Specification for executing functional tests
 version: 0.1
 phases:
   install:

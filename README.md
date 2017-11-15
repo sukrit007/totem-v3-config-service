@@ -28,7 +28,7 @@ npm install
 ## Run
  
 ### Local
-
+TODO: Add steps for invoking lambda function locally.
 
 
 ## Test
