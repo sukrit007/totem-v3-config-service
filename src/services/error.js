@@ -47,10 +47,21 @@ class EventHandlerNotRegistered extends ServiceError {
   }
 }
 
-class ValidationError extends ServiceError {
-  constructor(msg, errors) {
-    super(msg, null);
+class UnsupportedInputVersion extends BaseError {
+  constructor(version, task) {
+    super(`Unsupported version: ${version} for ${task}`);
     this.code = 'validation_error';
+    this.version = version;
+    this.task = task;
+    this.statusCode = HttpStatus.BAD_REQUEST;
+  }
+}
+
+class ValidationError extends BaseError {
+  constructor(schema, errors) {
+    super(`Validation failed for schema: ${schema}`);
+    this.code = 'validation_error';
+    this.schema = schema;
     this.errors = errors;
     this.statusCode = HttpStatus.BAD_REQUEST;
   }
@@ -70,5 +81,6 @@ module.exports = {
   WebhookUnauthorized,
   GitRepoNotFound,
   ValidationError,
+  UnsupportedInputVersion,
   EventHandlerNotRegistered
 };

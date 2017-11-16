@@ -29,7 +29,7 @@ function registerCommonServices() {
 
 function registerSchemas() {
   let ajv = setupAsync(new Ajv({
-    async: 'test'
+    async: true
   }));
   glob.sync('./config/schemas/*.json').forEach(file => {
     let schemaName = path.basename(file, 'json');

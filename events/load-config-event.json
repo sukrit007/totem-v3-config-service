@@ -2,5 +2,5 @@
   "version": "v1",
   "owner": "totem",
   "repo": "totem-demo",
-  "branch1": "develop"
+  "branch": "develop"
 }
