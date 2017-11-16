@@ -47,6 +47,15 @@ class EventHandlerNotRegistered extends ServiceError {
   }
 }
 
+class ValidationError extends ServiceError {
+  constructor(msg, errors) {
+    super(msg, null);
+    this.code = 'validation_error';
+    this.errors = errors;
+    this.statusCode = HttpStatus.BAD_REQUEST;
+  }
+}
+
 class WebhookUnauthorized extends BaseError {
   constructor() {
     super('Invalid/Missing X-Hub-Signature header', null);
@@ -60,5 +69,6 @@ module.exports = {
   BusinessRuleViolation,
   WebhookUnauthorized,
   GitRepoNotFound,
+  ValidationError,
   EventHandlerNotRegistered
 };

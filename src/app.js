@@ -5,6 +5,8 @@
 
 const
   logger = require('./common/logger'),
+  Ajv = require('ajv'),
+  setupAsync = require('ajv-async'),
   constants = require('./common/constants'),
   bottle = constants.BOTTLE_CONTAINER,
   glob = require('glob'),
@@ -23,7 +25,18 @@ function registerCommonServices() {
   bottle.value('githubApi', new GitHub({
     token: config.github.token
   }));
-  bottle.value('stepFunctions', new AWS.StepFunctions(_.merge({}, config.aws)));
+}
+
+function registerSchemas() {
+  let ajv = setupAsync(new Ajv({
+    async: 'test'
+  }));
+  glob.sync('./config/schemas/*.json').forEach(file => {
+    let schemaName = path.basename(file, 'json');
+    let schema = require(path.resolve(file));
+    ajv.addSchema(schema, schemaName);
+  });
+  bottle.value('validator', ajv);
 }
 
 module.exports = {
@@ -31,6 +44,9 @@ module.exports = {
 
     //Setup common bottle services / values
     registerCommonServices();
+
+    // Register validation schemas
+    registerSchemas();
 
     // Return the handler
     return (event, context, callback) => {

@@ -1,0 +1,65 @@
+{
+  "definitions": {},
+  "$id": "load-config-request-v1",
+  "type": "object",
+  "properties": {
+    "version": {
+      "$id": "/properties/version",
+      "type": "string",
+      "enum": [
+        "v1"
+      ],
+      "title": "Request version",
+      "description": "Request version",
+      "default": "v1",
+      "examples": [
+        "v1"
+      ],
+      "minLength": 1,
+      "maxLength": 4
+    },
+    "owner": {
+      "$id": "/properties/owner",
+      "type": "string",
+      "title": "Git owner",
+      "description": "Git owner for config lookup",
+      "default": "",
+      "examples": [
+        "totem"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "repo": {
+      "$id": "/properties/repo",
+      "type": "string",
+      "title": "The Repo Schema.",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "totem-demo"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "branch": {
+      "$id": "/properties/branch",
+      "type": "string",
+      "title": "The Branch Schema.",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "develop"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    }
+  },
+  "required": [
+    "version",
+    "owner",
+    "repo",
+    "branch"
+  ],
+  "$async": true
+}
