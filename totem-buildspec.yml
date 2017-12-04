@@ -3,7 +3,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - npm install npm@5
+      - npm install -g npm@5
       - npm install --prod
       - pip install --upgrade awscli
 
