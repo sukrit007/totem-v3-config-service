@@ -50,12 +50,4 @@ class GithubService {
 
 bottle.service('github', GithubService, 'githubApi');
 
-// let service = new GithubService(new GitHub({
-//   token: config.github.token
-// }));
-//
-// service.loadFile('totem.yml', 'totem', 'totem-demo', 'develop').then(data => {
-//   logger.info(data);
-// });
-
 module.exports = GithubService;

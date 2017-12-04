@@ -5,18 +5,14 @@ require('../../init');
 const
   sinon = require('sinon'),
   HttpStatus = require('http-status-codes'),
-  error = require('../../../src/services/error'),
   GithubService = require('../../../src/services/github');
 
 const
-  MOCK_API_URL = 'https://mock-api-url',
   MOCK_REPO = 'mock-repo',
-  MOCK_HOOK_ID = 123458,
+  MOCK_PATH = './mock-config.yml',
   MOCK_OWNER = 'mock-owner',
-  MOCK_HOOK_SECRET = 'mock-secret',
-  MOCK_PAYLOAD = `{"ref": "refs/heads/master"}`,
-  MOCK_PAYLOAD_SIGNATURE='sha1=d62588014020e33f70ca7f24f050b03df95a11de',
-  MOCK_GITHUB_HOOK_URL = 'https://mock-github-webhook-url';
+  MOCK_REF = 'mock-ref',
+  MOCK_DATA = 'mock-data';
 
 describe('GithubService', () => {
 
@@ -28,16 +24,43 @@ describe('GithubService', () => {
     };
 
     hubRepo = {
-      listHooks: sinon.stub(),
-      updateHook: sinon.stub(),
-      createHook: sinon.stub()
+      getContents: sinon.stub()
     };
 
+    githubApi.getRepo.returns(hubRepo);
+    service = new GithubService(githubApi);
+  });
 
-    service = new GithubService(githubApi, {
-      config: {
-        secret: MOCK_HOOK_SECRET
-      }
+  describe('loadFile', () => {
+
+    it('should load existing file from github', () => {
+
+      hubRepo.getContents.returns(Promise.resolve({
+        data: MOCK_DATA
+      }));
+      return service.loadFile(MOCK_PATH, MOCK_OWNER, MOCK_REPO, MOCK_REF).should.eventually.equal(MOCK_DATA)
+        .then(() => {
+          githubApi.getRepo.should.be.calledWithExactly(MOCK_OWNER, MOCK_REPO);
+          hubRepo.getContents.should.be.calledWithExactly(MOCK_REF, MOCK_PATH, true);
+        });
+    });
+
+    it('should return null when file is not found in github', () => {
+      let error = new Error('Mock error. Please ignore');
+      error.response = {
+        status: HttpStatus.NOT_FOUND
+      };
+      hubRepo.getContents.returns(Promise.reject(error));
+      return service.loadFile(MOCK_PATH, MOCK_OWNER, MOCK_REPO, MOCK_REF).should.eventually.equal(null);
+    });
+
+    it('should throw error when unknown error happens invoking github', () => {
+      let error = new Error('Mock error. Please ignore');
+      error.response = {
+        status: HttpStatus.INTERNAL_SERVER_ERROR
+      };
+      hubRepo.getContents.returns(Promise.reject(error));
+      return service.loadFile(MOCK_PATH, MOCK_OWNER, MOCK_REPO, MOCK_REF).should.be.rejectedWith(error);
     });
   });
 
