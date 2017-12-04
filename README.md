@@ -32,9 +32,19 @@ npm install
 To invoke config load task lambda function locally, execute command:
 
 ```bash
-sam local invoke --template totem-deploy.yml --event events/load-config-event.json
+env AWS_ACCESS_KEY_ID='[AWS_ACCESS_KEY_ID]' \
+    AWS_SECRET_ACCESS_KEY='[AWS_SECRET_ACCESS_KEY]' \
+    AWS_REGION=us-west-2 \
+    GITHUB_TOKEN='[GITHUB_TOKEN]' \
+    TOTEM_BUCKET='[TOTEM_BUCKET]'
+    sam local invoke --template totem-deploy.yml --event events/load-config-event.json
 ```
-
+where:
+- **GITHUB_TOKEN**: Github token used for fetching configs from github repo.
+- **AWS_REGION**: Aws region where config-service is deployed
+- **AWS_ACCESS_KEY_ID**: AWS Access Key ID (For S3 Totem bucket)
+- **AWS_SECRET_ACCESS_KEY**: AWS Access Key ID (For S3 Totem bucket)
+- **TOTEM_BUCKET**: S3 bucket for totem (for storing configs)
 
 ## Test
 
