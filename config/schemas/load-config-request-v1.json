@@ -33,7 +33,7 @@
     "repo": {
       "$id": "/properties/repo",
       "type": "string",
-      "title": "The Repo Schema.",
+      "title": "Git repository",
       "description": "An explanation about the purpose of this instance.",
       "default": "",
       "examples": [
@@ -45,11 +45,35 @@
     "branch": {
       "$id": "/properties/branch",
       "type": "string",
-      "title": "The Branch Schema.",
-      "description": "An explanation about the purpose of this instance.",
+      "title": "Git branch",
+      "description": "Git branch",
       "default": "",
       "examples": [
         "develop"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "commit": {
+      "$id": "/properties/commit",
+      "type": "string",
+      "title": "Git commit",
+      "description": "Git commit",
+      "default": "",
+      "examples": [
+        "f1be5fe2f170123a71234b003de785ef36472493"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "jobId": {
+      "$id": "/properties/jobId",
+      "type": "string",
+      "title": "Job Id",
+      "description": "Job Id",
+      "default": "",
+      "examples": [
+        "f581205b-09de-4ca3-9f6d-a5e2d9767ce5"
       ],
       "minLength": 1,
       "maxLength": 255
@@ -59,7 +83,8 @@
     "version",
     "owner",
     "repo",
-    "branch"
+    "branch",
+    "commit"
   ],
   "$async": true
 }

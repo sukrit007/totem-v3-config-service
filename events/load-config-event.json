@@ -2,5 +2,6 @@
   "version": "v1",
   "owner": "totem",
   "repo": "totem-demo",
-  "branch": "develop"
+  "branch": "develop",
+  "commit": "f1be5fe2f170123a71234b003de785ef36472493"
 }

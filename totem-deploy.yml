@@ -40,7 +40,11 @@ Resources:
       Runtime: nodejs6.10
       Timeout: 30
       Environment:
-        Variables: {}
+        Variables:
+          TOTEM_BUCKET:
+            Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+          NODE_ENV: !Ref Environment
+          GITHUB_TOKEN: !Ref GithubOauthToken
       Role:
         Fn::ImportValue: !Sub "${EnvironmentStack}-LambdaRoleArn"
 

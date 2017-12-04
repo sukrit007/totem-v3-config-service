@@ -10,6 +10,15 @@ aws:
 gitHookStateMachine:
   arn: GIT_HOOK_STATE_MACHINE
 
+configRepo:
+  owner: CONFIG_REPO_OWNER
+  repo: CONFIG_REPO
+  branch: CONFIG_REPO_BRANCH
+  env: NODE_ENV
+
+output:
+  bucket: TOTEM_BUCKET
+
 tests:
   functional:
     github:

@@ -25,6 +25,10 @@ function registerCommonServices() {
   bottle.value('githubApi', new GitHub({
     token: config.github.token
   }));
+
+  bottle.value('s3', new AWS.S3({
+    region: config.aws.region
+  }));
 }
 
 function registerSchemas() {
@@ -50,6 +54,7 @@ module.exports = {
 
     // Return the handler
     return (event, context, callback) => {
+      logger.info('app: loadConfigTask');
       return bottle.container['tasks-load-config'].handle(event, context, callback);
     };
   }

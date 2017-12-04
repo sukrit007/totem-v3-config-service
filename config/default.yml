@@ -17,6 +17,18 @@ github:
       # secret: "Should be injected from env variable"
       # url: "Will automatically be injected from the orchestrator setup code"
 
+configRepo:
+  env: 'development'
+#  owner: ''
+#  repo: ''
+#  branch: ''
+
+output:
+  type: 's3'
+  prefix: 'configs'
+  # Load from env variables
+  # bucket: ''
+
 gitHookStateMachine:
   # OVerride this from environment variable
   arn: ''
