@@ -2,8 +2,8 @@
 
 ### Environment stack
 
-#### New Environment Stack
-This step assumes that you have already created [global resources stack](./global-resources-stack).
+#### Create/Update Environment Stack
+This step assumes that you have already created [global resources stack](https://github.com/totem/totem-v3/tree/develop/provisioning#creating-global-resources).
 To spin up new environment stack, execute the following command from [parent folder](..): 
 
 
@@ -13,47 +13,27 @@ PROFILE=[AWS_CLI_PROFILE]
 TOTEM_BUCKET="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
   --logical-resource-id=TotemBucket \
   --stack-name=totem-global \
-  --output text | tail -1 | awk '{print $1}')" &&
-
-OUTPUT_TEMPLATE="$TOTEM_BUCKET/cloudformation/totem-config-service-environment.yml" && 
-
-aws --profile=$PROFILE s3 cp ./totem-environment.yml s3://$OUTPUT_TEMPLATE &&
-
-aws --profile=$PROFILE cloudformation create-stack \
-  --template-url=https://s3.amazonaws.com/$OUTPUT_TEMPLATE \
-  --stack-name=totem-config-service-environment \
+  --output text | tail -1 | awk '{print $5}')" &&
+    
+aws --profile=$PROFILE cloudformation deploy \
   --capabilities=CAPABILITY_NAMED_IAM \
+  --template-file=./totem-environment.yml \
+  --s3-bucket="$TOTEM_BUCKET" \
+  --s3-prefix="cloudformation/totem-config-service" \
+  --stack-name=totem-config-service-environment \
   --tags \
-    "Key=app,Value=totem-config-service" \
-    "Key=env,Value=development" \
-    "Key=client,Value=totem" \
-    "Key=stacktype,Value=totem-config-service-environment"
+    "app=totem-v3-config-service" \
+    "env=development" \
+    "client=meltmedia" \
+    "stacktype=totem-environment"
 ```
 
 where:
 - **AWS_CLI_PROFILE**: [AWS CLI Profile](http://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
 
 
-To monitor the status of the stack creation, use command:
-
-```bash
-aws --profile=contrail cloudformation describe-stacks \
-  --stack-name=totem-config-service-environment  
-```
-
 Note:
 - You must modify tags for appropriate totem cluster
-
-#### Update Environment Stack
-To update existing environmnet stack, run command:
-
-```bash
-aws --profile=contrail cloudformation deploy \         
-  --template-file=./totem-environment.yml \                    
-  --stack-name=totem-config-service-environment \
-  --capabilities=CAPABILITY_NAMED_IAM
-```
-
 
 ## Setup Pipeline
 
