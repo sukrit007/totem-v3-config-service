@@ -54,7 +54,7 @@ TOTEM_BUCKET="$(aws --profile=$PROFILE cloudformation describe-stack-resource \
 aws --profile=$PROFILE cloudformation deploy \
   --template-file=./totem-pipeline.yml \
   --s3-bucket="$TOTEM_BUCKET" \
-  --s3-prefix="cloudformation/totem-orchestrator/" \
+  --s3-prefix="cloudformation/totem-config-service" \
   --stack-name=totem-config-service-pipeline-${ENVIRONMENT} \
   --tags \
     "app=totem-v3-config-service" \
@@ -62,7 +62,7 @@ aws --profile=$PROFILE cloudformation deploy \
     "client=meltmedia" \
     "stacktype=totem-pipeline" \
   --parameter-overrides \
-    "GitBranch=feature_config" \
+    "GitBranch=develop" \
     "GithubOauthToken=${GITHUB_OAUTH_TOKEN}" \
     "WebhookSecret=${WEBHOOK_SECRET}" \
     "TestGitRepo=totem-demo" \
