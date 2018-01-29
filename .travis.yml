@@ -1,0 +1,20 @@
+dist: trusty
+sudo: false
+language: node_js
+services: {}
+node_js:
+  - '6.10'
+env:
+  global:
+    - NODE_ENV=travis
+
+install:
+  - npm install -g npm@5
+  - npm install -g gulp-cli
+  - npm install || (sleep 10s && npm install)
+script: gulp travis --skip-tests=@external
+notifications:
+  slack:
+    rooms:
+    secure: "Rzm639oZ0M56yuWJmLDTBsU5ciUHn2QjA0Ka6A38PLNtlw42taZai8n16Z8kmY0uOva61nO+fqC6VNC+DWfVznUlh2329FKoSMsHT5K8IcKcL941ryJKt/uAljAqusLLOgEidHpoA/ScaGuY3E5R8PMAcQ45NbTUbuxjdE5js+eOBxTJ/l5U+ix2LqJgGNJR9jVEc1XGg6mWtgx/Zwz9gHTlD2V8sgm3dvcwmtOqXkBSWssmU6Kf60XJoYJim5LWTPAaBLBs8IHnrFe/VG+XpvyVsAgLvohM2aCZQO6Y74mtO1whHfAVg/e8fl3bOK/LtTbeRtWQkhorgKly7Lv6PKoFjrlkp+J9p1QCsCCOnc/FZ4Pk7hf23ocX1TQ3jocpzFX41INElEqBgUF2IW7toCHghcKK+HyffiPy4saWk9k4lCxzM/pZ8TF7Sv5Ht54LDgboFtTxpagmx0SagN6edkl1jp0c0Sqga/hLGpQH73sxRl3kj6PnPYQmh2sI9IEHTxDx7YMVQmGTDD7ZAfa++P+l3hbDS4mk9gxq6uUWUwcfdTWsdN/lTT69Sm04aPXAXLHqHdtNpc+d++onivRfSc22/6CZEsMrkbsErp/06CHLmWGhTLGMEkZjaDKsDgLtNAbwrg2W+6bMLkeZxJzemtqCiLr9ELsVNuDGuUPABM0="
+    on_success: change

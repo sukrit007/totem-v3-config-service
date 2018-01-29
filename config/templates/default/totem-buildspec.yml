@@ -1,0 +1,83 @@
+# Cloudformation template for cd builds
+Parameters:
+  GitBranch:
+    Type: String
+    Description: Git branch for source repository
+    MinLength: 1
+
+  GitOwner:
+    Type: String
+    Description: Owner of the github repository
+
+  GitRepo:
+    Type: String
+    Description: Git repository for the pipeline
+
+  GithubOauthToken:
+    Type: String
+    NoEcho: true
+    Description: Github Oauthtoken
+    MinLength: 1
+
+  GlobalStack:
+    Description: Name of totem global stack
+    Type: String
+    MinLength: 1
+    Default: 'totem-global'
+
+  Environment:
+    Description: App Environment (development, production, etc)
+    Type: String
+    MinLength: 1
+
+  EnvironmentStack:
+    Description: App environment stack
+    Type: String
+    MinLength: 1
+
+  App:
+    Description: Application name
+    Type: String
+    MinLength: 1
+
+  Client:
+    Description: Client for the application
+    Type: String
+    MinLength: 1
+
+  CodeBuildSpec:
+    Description: Code build spec. location or raw spec.
+    Type: String
+    MinLength: 1
+    Default: 'buildspec.yml'
+
+
+Resources:
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    DependsOn: CodeBuild
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location:
+          Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+      RoleArn:
+        Fn::ImportValue: !Sub "${EnvironmentStack}-CodePipelineRoleArn"
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: source
+              ActionTypeId:
+                Category: Source
+                Owner: "ThirdParty"
+                Provider: "GitHub"
+                Version: 1
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: source
+              Configuration:
+                Owner: !Ref GitOwner
+                Repo: !Ref GitRepo
+                Branch: !Ref GitBranch
+                OAuthToken: !Ref GithubOauthToken
+              RunOrder: 1

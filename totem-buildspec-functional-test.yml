@@ -1,0 +1,14 @@
+# AWS CodeBuild Build Specification for executing functional tests
+version: 0.1
+phases:
+  install:
+    commands:
+      - npm install -g npm@5
+      - npm install -g gulp-cli
+      - npm install
+
+  build:
+    commands:
+      - |
+          set -o pipefail \
+          && gulp test:functional

@@ -1,0 +1,28 @@
+# Maps environment variables to config service (See https://github.com/lorenwest/node-config/wiki/Environment-Variables)
+github:
+  token: GITHUB_TOKEN
+  hookDef:
+    config:
+      secret: WEBHOOK_SECRET
+aws:
+  region: AWS_REGION
+
+gitHookStateMachine:
+  arn: GIT_HOOK_STATE_MACHINE
+
+configRepo:
+  owner: CONFIG_REPO_OWNER
+  repo: CONFIG_REPO
+  branch: CONFIG_REPO_BRANCH
+  env: NODE_ENV
+
+output:
+  bucket: TOTEM_BUCKET
+
+tests:
+  functional:
+    github:
+      testOwner: TEST_OWNER
+      testRepo: TEST_REPO
+      token: GITHUB_TOKEN
+      testBranch: TEST_BRANCH

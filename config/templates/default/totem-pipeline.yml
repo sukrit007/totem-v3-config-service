@@ -1,0 +1,180 @@
+# Cloudformation template for automated repository builds
+Parameters:
+  CodePipelineBucketName:
+    Type: String
+    Description: S3 bucket used for uploading artifacts for CodePipeline
+    MinLength: 1
+
+  GitBranch:
+    Type: String
+    Description: Git branch for source repository
+    MinLength: 1
+
+  GitOwner:
+    Type: String
+    Description: Owner of the github repository
+
+  GitRepo:
+    Type: String
+    Description: Orchestrator repository
+
+  GlobalStack:
+    Description: Name of totem global stack
+    Type: String
+    MinLength: 1
+    Default: 'totem-global'
+
+  Environment:
+    Description: Application environment (development, production, etc)
+    Type: String
+    MinLength: 1
+
+  App:
+    Description: Application name for orchestrator stack
+    Type: String
+    MinLength: 1
+
+  Client:
+    Description: Application client
+    Type: String
+    MinLength: 1
+    Default: 'totem'
+
+
+Resources:
+  CodeBuild:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Description: !Sub "Totem-v3 Orchestrator ${GitBranch} build"
+      Environment:
+        Type: LINUX_CONTAINER
+        Image: "aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0"
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: TOTEM_BUCKET
+            Value:
+              Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+          - Name: APP
+            Value: !Ref App
+          - Name: CLIENT
+            Value: !Ref Client
+          - Name: ENVIRONMENT
+            Value: !Ref Environment
+          - Name: GIT_OWNER
+            Value: !Ref GitOwner
+          - Name: GIT_REPO
+            Value: !Ref GitRepo
+          - Name: GIT_BRANCH
+            Value: !Ref GitBranch
+
+      ServiceRole:
+        Fn::ImportValue: !Sub "${OrchestratorEnvironmentStack}-CodeBuildRole"
+      Source:
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 20
+
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    DependsOn: CodeBuild
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location:
+          Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+      RoleArn:
+        Fn::ImportValue: !Sub "${OrchestratorEnvironmentStack}-CodePipelineRoleArn"
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: source
+              ActionTypeId:
+                Category: Source
+                Owner: "ThirdParty"
+                Provider: "GitHub"
+                Version: 1
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: source
+              Configuration:
+                Owner: !Ref GitOwner
+                Repo: !Ref GitRepo
+                Branch: !Ref GitBranch
+                OAuthToken: !Ref GithubOauthToken
+              RunOrder: 1
+
+        - Name: Build
+          Actions:
+            - Name: CodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: "AWS"
+                Provider: "CodeBuild"
+                Version: 1
+              InputArtifacts:
+                - Name: source
+              OutputArtifacts:
+                - Name: build
+              Configuration:
+                ProjectName: !Ref CodeBuild
+              RunOrder: 1
+
+        - Name: Deploy
+          Actions:
+            - Name: SAMCreateChangeSet
+              ActionTypeId:
+                Category: Deploy
+                Owner: "AWS"
+                Provider: "CloudFormation"
+                Version: 1
+              InputArtifacts:
+                - Name: build
+              OutputArtifacts: []
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                RoleArn:
+                  Fn::ImportValue: !Sub "${OrchestratorEnvironmentStack}-LambdaDeployRoleArn"
+                StackName: !Sub "totem-orchestrator-${Environment}"
+                ChangeSetName: LamdaDeploy
+                TemplatePath: "build::packaged-template.yml"
+                TemplateConfiguration: "build::template-config.json"
+                ParameterOverrides: !Sub |
+                  {
+                    "OrchestratorEnvironmentStack": "${OrchestratorEnvironmentStack}",
+                    "GlobalStack": "${GlobalStack}",
+                    "Environment": "${Environment}",
+                    "GitBranch": "${GitBranch}",
+                    "GithubOauthToken": "${GithubOauthToken}",
+                    "WebhookSecret": "${WebhookSecret}"
+                  }
+              RunOrder: 1
+
+            - Name: SAMExecuteChangeSet
+              ActionTypeId:
+                Category: Deploy
+                Owner: "AWS"
+                Provider: "CloudFormation"
+                Version: 1
+              OutputArtifacts:
+                - Name: deploy
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: !Sub "totem-orchestrator-${Environment}"
+                ChangeSetName: LamdaDeploy
+              RunOrder: 2
+
+        - Name: FunctionalTest
+          Actions:
+            - Name: FunctionalTest
+              ActionTypeId:
+                Category: Test
+                Owner: "AWS"
+                Provider: "CodeBuild"
+                Version: 1
+              InputArtifacts:
+                - Name: source
+              OutputArtifacts: []
+              Configuration:
+                ProjectName: !Ref CodeBuildFunctionalTest
+              RunOrder: 1

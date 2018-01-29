@@ -1,0 +1,36 @@
+# AWS CodeBuild Build Specification for Building and packaging Config Service
+version: 0.1
+phases:
+  install:
+    commands:
+      - npm install -g npm@5
+      - npm install --prod
+      - pip install --upgrade awscli
+
+  build:
+    commands:
+      - aws cloudformation package
+            --template-file totem-deploy.yml
+            --s3-bucket $TOTEM_BUCKET
+            --output-template-file totem-deploy-package.yml
+            --s3-prefix=cloudformation/sam
+      - |
+          cat <<END>template-config.json
+          {
+            "Tags" : {
+                "app" : "$APP",
+                "env" : "$ENVIRONMENT",
+                "client" : "$CLIENT",
+                "stacktype" : "totem-deploy",
+                "git-owner" : "$GIT_OWNER",
+                "git-repo" : "$GIT_REPO",
+                "git-branch" : "$GIT_BRANCH",
+                "git-commit": "$CODEBUILD_RESOLVED_SOURCE_VERSION"
+              }
+          }
+          END
+artifacts:
+  type: zip
+  files:
+    - totem-deploy-package.yml
+    - template-config.json

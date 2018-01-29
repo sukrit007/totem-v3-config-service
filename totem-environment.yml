@@ -1,0 +1,212 @@
+# This template sets up IAM roles/profiles and dependencies for Totem-V3 Config Service
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  GlobalStack:
+    Description: Name of totem global stack
+    Type: String
+    MinLength: 1
+    Default: 'totem-global'
+
+Resources:
+
+  LambdaRole:
+    # See: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-aws-serverless.html
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: LambdaExecution
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'states:*'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+                      - "*"
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+
+      Path: /
+      Policies:
+        - PolicyName: code-build
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'codepipeline:GetPipelineState'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+                      - "*"
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:DescribeStackResource'
+                Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:*:stack/totem-config-service*"
+
+  LambdaDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: lamda-deploy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:*'
+                  - 'apigateway:*'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'logs:Describe*'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'
+                Resource: '*'
+
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+                      - "*"
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:*'
+                Resource: '*'
+
+              - Effect: Allow
+                Action:
+                  - 'states:*'
+                Resource: '*'
+
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: code-pipeline
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                  - 'lambda:ListFunctions'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'codebuild:BatchGetBuilds'
+                  - 'codebuild:StartBuild'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:*'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 's3:Get*'
+                  - 's3:PutObject'
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+                      - "*"
+
+Outputs:
+  LambdaRoleArn:
+    Value: !GetAtt LambdaRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-LambdaRoleArn
+
+  CodeBuildRole:
+    Value: !Ref CodeBuildRole
+    Export:
+      Name: !Sub ${AWS::StackName}-CodeBuildRole
+
+
+  CodePipelineRoleArn:
+    Value: !GetAtt CodePipelineRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-CodePipelineRoleArn
+
+  LambdaDeployRoleArn:
+    Value: !GetAtt LambdaDeployRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-LambdaDeployRoleArn

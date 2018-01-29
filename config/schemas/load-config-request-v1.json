@@ -1,0 +1,90 @@
+{
+  "definitions": {},
+  "$id": "load-config-request-v1",
+  "type": "object",
+  "properties": {
+    "version": {
+      "$id": "/properties/version",
+      "type": "string",
+      "enum": [
+        "v1"
+      ],
+      "title": "Request version",
+      "description": "Request version",
+      "default": "v1",
+      "examples": [
+        "v1"
+      ],
+      "minLength": 1,
+      "maxLength": 4
+    },
+    "owner": {
+      "$id": "/properties/owner",
+      "type": "string",
+      "title": "Git owner",
+      "description": "Git owner for config lookup",
+      "default": "",
+      "examples": [
+        "totem"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "repo": {
+      "$id": "/properties/repo",
+      "type": "string",
+      "title": "Git repository",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "totem-demo"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "branch": {
+      "$id": "/properties/branch",
+      "type": "string",
+      "title": "Git branch",
+      "description": "Git branch",
+      "default": "",
+      "examples": [
+        "develop"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "commit": {
+      "$id": "/properties/commit",
+      "type": "string",
+      "title": "Git commit",
+      "description": "Git commit",
+      "default": "",
+      "examples": [
+        "f1be5fe2f170123a71234b003de785ef36472493"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "jobId": {
+      "$id": "/properties/jobId",
+      "type": "string",
+      "title": "Job Id",
+      "description": "Job Id",
+      "default": "",
+      "examples": [
+        "f581205b-09de-4ca3-9f6d-a5e2d9767ce5"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    }
+  },
+  "required": [
+    "version",
+    "owner",
+    "repo",
+    "branch",
+    "commit"
+  ],
+  "$async": true
+}
