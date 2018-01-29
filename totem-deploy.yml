@@ -53,3 +53,9 @@ Outputs:
   LoadConfigTask:
     Description: Config Service Tasks Lambda Function
     Value: !Ref LoadConfigTask
+
+  LoadConfigTaskArn:
+    Description: Config Service Tasks Lambda Function (ARN)
+    Value: !GetAtt LoadConfigTask.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-LoadConfigTaskArn
