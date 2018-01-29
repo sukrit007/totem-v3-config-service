@@ -67,18 +67,10 @@ class ValidationError extends BaseError {
   }
 }
 
-class WebhookUnauthorized extends BaseError {
-  constructor() {
-    super('Invalid/Missing X-Hub-Signature header', null);
-    this.statusCode = HttpStatus.UNAUTHORIZED;
-  }
-}
-
 module.exports = {
   BaseError,
   ServiceError,
   BusinessRuleViolation,
-  WebhookUnauthorized,
   GitRepoNotFound,
   ValidationError,
   UnsupportedInputVersion,

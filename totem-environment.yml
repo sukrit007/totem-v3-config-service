@@ -26,14 +26,24 @@ Resources:
               - 'sts:AssumeRole'
       Path: /
       Policies:
-        - PolicyName: StateMachineAccess
+        - PolicyName: LambdaExecution
           PolicyDocument:
             Statement:
               - Effect: Allow
                 Action:
                   - 'states:*'
                 Resource: '*'
-
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Fn::ImportValue: !Sub "${GlobalStack}-TotemBucket"
+                      - "*"
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
