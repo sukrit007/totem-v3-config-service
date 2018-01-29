@@ -59,7 +59,7 @@ class UnsupportedInputVersion extends BaseError {
 
 class ValidationError extends BaseError {
   constructor(schema, errors) {
-    super(`Validation failed for schema: ${schema}`);
+    super(`Validation failed for schema: ${schema}. Reason:${errors}`);
     this.code = 'validation_error';
     this.schema = schema;
     this.errors = errors;
