@@ -64,7 +64,6 @@ aws --profile=$PROFILE cloudformation deploy \
   --parameter-overrides \
     "GitBranch=develop" \
     "GithubOauthToken=${GITHUB_OAUTH_TOKEN}" \
-    "WebhookSecret=${WEBHOOK_SECRET}" \
     "TestGitRepo=totem-demo" \
     "TestGitOwner=totem" \
     "Environment=${ENVIRONMENT}"
